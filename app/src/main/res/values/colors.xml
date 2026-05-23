@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_primary">#0D1117</color>
+    <color name="bg_secondary">#111827</color>
+    <color name="bg_card">#171F2B</color>
+    <color name="glass_white">#26FFFFFF</color>
+    <color name="glass_stroke">#40FFFFFF</color>
+    <color name="silver">#D9E2F2</color>
+    <color name="silver_soft">#AEB7C5</color>
+    <color name="accent_blue">#7DD3FC</color>
+    <color name="accent_glow">#38BDF8</color>
+    <color name="charcoal">#1F2937</color>
+    <color name="online_green">#34D399</color>
+    <color name="message_me">#1E3A5F</color>
+    <color name="message_other">#1F2937</color>
+    <color name="input_dark">#121926</color>
+</resources>

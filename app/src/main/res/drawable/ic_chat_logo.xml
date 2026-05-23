@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Outer Glass Circle -->
+    <path
+        android:fillColor="#1FFFFFFF"
+        android:pathData="M60,10A50,50 0 1,1 59.9,10Z"/>
+
+    <!-- Glow Stroke -->
+    <path
+        android:strokeWidth="2"
+        android:strokeColor="#66D9E2F2"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M60,14A46,46 0 1,1 59.9,14Z"/>
+
+    <!-- Chat Bubble -->
+    <path
+        android:fillColor="#D9E2F2"
+        android:pathData="
+            M38,42
+            C38,34 44,28 52,28
+            L68,28
+            C76,28 82,34 82,42
+            L82,58
+            C82,66 76,72 68,72
+            L55,72
+            L44,82
+            L46,70
+            C41,68 38,63 38,58
+            Z"/>
+
+</vector>

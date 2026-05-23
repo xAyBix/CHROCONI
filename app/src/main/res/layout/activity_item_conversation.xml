@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="8dp"
+    android:background="@drawable/bg_glass_card"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackgroundBorderless"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <!-- Avatar -->
+    <FrameLayout
+        android:layout_width="58dp"
+        android:layout_height="58dp">
+
+        <ImageView
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/avatar_placeholder" />
+
+    </FrameLayout>
+
+    <!-- Texts -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alexander"
+            android:textColor="@color/silver"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="See you tonight ✨"
+            android:textColor="@color/silver_soft"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- Time -->
+    <TextView
+        android:id="@+id/tvTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="11:42"
+        android:textColor="@color/silver_soft"
+        android:textSize="12sp" />
+
+</LinearLayout>

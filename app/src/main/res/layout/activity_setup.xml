@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_primary">
+
+    <!-- Ambient Top Glow -->
+    <View
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        android:layout_marginTop="-120dp"
+        android:layout_marginEnd="-100dp"
+        android:alpha="0.95"
+        android:background="@drawable/glow_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Secondary Glow -->
+    <View
+        android:layout_width="260dp"
+        android:layout_height="260dp"
+        android:layout_marginStart="-80dp"
+        android:layout_marginBottom="-100dp"
+        android:alpha="0.6"
+        android:background="@drawable/glow_circle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Main Glass Card -->
+    <LinearLayout
+        android:id="@+id/setupCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="26dp"
+        android:background="@drawable/bg_glass_card"
+        android:elevation="14dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Logo -->
+        <ImageView
+            android:id="@+id/logoImage"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/logo" />
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Secure Setup"
+            android:textColor="@color/silver"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="28dp"
+            android:gravity="center"
+            android:text="Create your encrypted access credentials"
+            android:textColor="@color/silver_soft"
+            android:textSize="14sp" />
+
+        <!-- Password -->
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_glass"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:paddingHorizontal="18dp"
+            android:textColor="@color/silver"
+            android:textColorHint="@color/silver_soft"
+            android:textSize="15sp" />
+
+        <!-- Confirm Password -->
+        <EditText
+            android:id="@+id/etConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_input_glass"
+            android:hint="Confirm Password"
+            android:inputType="textPassword"
+            android:paddingHorizontal="18dp"
+            android:textColor="@color/silver"
+            android:textColorHint="@color/silver_soft"
+            android:textSize="15sp" />
+
+        <!-- Token -->
+        <EditText
+            android:id="@+id/etToken"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginBottom="28dp"
+            android:background="@drawable/bg_input_glass"
+            android:hint="Github Personal Access Token"
+            android:inputType="textNoSuggestions"
+            android:paddingHorizontal="18dp"
+            android:textColor="@color/silver"
+            android:textColorHint="@color/silver_soft"
+            android:textSize="15sp" />
+
+        <!-- Setup Button -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:background="@drawable/bg_button_glow">
+
+            <Button
+                android:id="@+id/btnSetup"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:text="Initialize Vault"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </FrameLayout>
+
+        <!-- Footer -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:alpha="0.75"
+            android:text="Your credentials are locally encrypted"
+            android:textColor="@color/silver_soft"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
