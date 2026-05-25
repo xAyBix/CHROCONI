@@ -45,6 +45,7 @@ public class SetupActivity extends AppCompatActivity {
         btnSetup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                v.setActivated(false);
                 String pText = etPassword.getText().toString();
                 String cText = etConfirmPassword.getText().toString();
                 String tText = etToken.getText().toString();
@@ -68,6 +69,7 @@ public class SetupActivity extends AppCompatActivity {
                     tryToConnect(tText);
 
                 }
+                v.setActivated(true);
 
             }
         });

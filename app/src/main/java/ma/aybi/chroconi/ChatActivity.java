@@ -4,15 +4,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class ChatActivity extends AppCompatActivity {
+
+    LinearLayout inputContainer;
     TextView tvUsername;
     ImageView btnBack;
     @Override
@@ -20,11 +24,39 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chat);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        inputContainer =
+                findViewById(R.id.inputContainer);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main),
+                (view, windowInsets) -> {
+
+                    Insets ime =
+                            windowInsets.getInsets(
+                                    WindowInsetsCompat.Type.ime());
+
+                    Insets systemBars =
+                            windowInsets.getInsets(
+                                    WindowInsetsCompat.Type.systemBars());
+
+                    // MOVE INPUT ABOVE KEYBOARD
+                    inputContainer.animate()
+                            .translationY(-ime.bottom)
+                            .setDuration(180)
+                            .start();
+
+                    // KEEP RECYCLER SAFE
+                    view.setPadding(
+                            0,
+                            systemBars.top,
+                            0,
+                            systemBars.bottom);
+
+                    return windowInsets;
         });
+
+
+        WindowCompat.setDecorFitsSystemWindows(
+                getWindow(),
+                false);
         String username =
                 getIntent().getStringExtra("username");
 

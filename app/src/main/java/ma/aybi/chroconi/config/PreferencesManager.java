@@ -12,6 +12,7 @@ public class PreferencesManager {
     private static final String FIRST_TIME = "first_time";
     private static final String SALT = "salt";
     private static final String TOKEN = "tkn";
+    private static final String CONN_ATTEMPTS = "conn_attempts";
 
     private static SharedPreferences getPrefs(
             Context context) {
@@ -59,5 +60,24 @@ public class PreferencesManager {
         getPrefs(context).edit()
                 .putString(SALT, new String(salt, Charsets.ISO_8859_1))
                 .apply();
+    }
+    public static int getConnAttempts(Context context) {
+        return getPrefs(context).getInt(CONN_ATTEMPTS, 0);
+    }
+    public static void increamentConnAttempts(Context context) {
+        getPrefs(context).edit()
+                .putInt(CONN_ATTEMPTS, 0)
+                .commit();
+    }
+    public static void resetConnAttempts(Context context) {
+        getPrefs(context).edit()
+                .putInt(CONN_ATTEMPTS, getConnAttempts(context)+1)
+                .apply();
+    }
+    public static void destroy (Context context) {
+        getPrefs(context).edit()
+                .clear()
+                .commit();
+
     }
 }

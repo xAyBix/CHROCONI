@@ -63,7 +63,7 @@ public class GithubConnection {
 
         volleyQueue.add(request);
     }
-    public static void createRepository () {
+    public static void createRepository (String repositoryName) {
 
     }
     public static void push () {

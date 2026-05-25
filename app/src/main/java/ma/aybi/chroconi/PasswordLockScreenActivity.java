@@ -1,6 +1,10 @@
 package ma.aybi.chroconi;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -34,6 +38,7 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
         unlockButton = findViewById(R.id.unlockButton);
         passwordInput = findViewById(R.id.passwordInput);
         unlockButton.setOnClickListener(v -> {
+            v.setActivated(false);
             String password = passwordInput.getText().toString();
             if (passwordCheck(password)) {
                 Encryptor.setSalt(
@@ -43,9 +48,22 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
                 byte[] byteToken = Encryptor.decrypt(
                         PreferencesManager.getToken(getApplicationContext())
                 );
-                if (byteToken == null) {
+                int attempts = PreferencesManager.getConnAttempts(getApplicationContext());
+                if (byteToken == null &&  attempts > 4) {
+                    PreferencesManager.destroy(getApplicationContext());
+
+                    PackageManager packageManager = getApplicationContext().getPackageManager();
+                    Intent intent = packageManager.getLaunchIntentForPackage(getApplicationContext().getPackageName());
+                    ComponentName componentName = intent.getComponent();
+                    Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+
+                    mainIntent.setPackage(getApplicationContext().getPackageName());
+                    getApplicationContext().startActivity(mainIntent);
+                    System.exit(0);
+                }else if (byteToken == null) {
                     passwordInput.setError("Wrong password");
-                }else {
+                    PreferencesManager.increamentConnAttempts(getApplicationContext());
+                }else{
                     String textToken = Encryptor.byteToString(byteToken);
                     GithubConnection.testConnection(getApplicationContext(), textToken, success -> {
                         if (success) {
@@ -58,6 +76,7 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
                                             | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                             startActivity(intent);
+                            PreferencesManager.resetConnAttempts(getApplicationContext());
 
                             unlockButton.animate()
                                     .scaleX(0.96f)
@@ -86,8 +105,7 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
             }else {
                 passwordInput.setError("Please enter a password");
             }
-
-
+            v.setActivated(true);
 
         });
     }
