@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="18dp"
+    android:background="@drawable/bg_dialog_glass"
+    android:elevation="20dp"
+    android:orientation="vertical"
+    android:padding="26dp">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Conversation"
+        android:textColor="@color/silver"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
+
+    <!-- Subtitle -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="24dp"
+        android:text="Initialize an encrypted chat"
+        android:textColor="@color/silver_soft"
+        android:textSize="13sp"/>
+
+    <!-- Username -->
+    <EditText
+        android:id="@+id/etHostname"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_input_glass"
+        android:hint="Hostname"
+        android:paddingHorizontal="18dp"
+        android:textColor="@color/silver"
+        android:textColorHint="@color/silver_soft" />
+
+    <!-- Token -->
+    <EditText
+        android:id="@+id/etInvitedname"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_marginBottom="28dp"
+        android:background="@drawable/bg_input_glass"
+        android:hint="Invitedname"
+        android:paddingHorizontal="18dp"
+        android:textColor="@color/silver"
+        android:textColorHint="@color/silver_soft" />
+
+    <!-- Create Button -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:background="@drawable/bg_button_glow">
+
+        <Button
+            android:id="@+id/btnCreate"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:text="Create"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+    </FrameLayout>
+
+</LinearLayout>

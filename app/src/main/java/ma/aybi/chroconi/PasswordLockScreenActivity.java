@@ -63,6 +63,7 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
                 }else if (byteToken == null) {
                     passwordInput.setError("Wrong password");
                     PreferencesManager.increamentConnAttempts(getApplicationContext());
+                    unlockButton.setText("UNLOCK (" + (5-PreferencesManager.getConnAttempts(getApplicationContext())) + ")" );
                 }else{
                     String textToken = Encryptor.byteToString(byteToken);
                     GithubConnection.testConnection(getApplicationContext(), textToken, success -> {

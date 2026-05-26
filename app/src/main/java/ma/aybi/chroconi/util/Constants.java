@@ -11,4 +11,7 @@ public class Constants {
     public static final int GCM_TAG_LENGTH = 128;
     public static final int GCM_IV_LENGTH = 12;
 
+    // PREFIXES
+    public static final String REPO_PREFIXES = "CHROCONI_CONV_";
+
 }

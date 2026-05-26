@@ -66,12 +66,12 @@ public class PreferencesManager {
     }
     public static void increamentConnAttempts(Context context) {
         getPrefs(context).edit()
-                .putInt(CONN_ATTEMPTS, 0)
+                .putInt(CONN_ATTEMPTS, getConnAttempts(context)+1)
                 .commit();
     }
     public static void resetConnAttempts(Context context) {
         getPrefs(context).edit()
-                .putInt(CONN_ATTEMPTS, getConnAttempts(context)+1)
+                .putInt(CONN_ATTEMPTS, 0)
                 .apply();
     }
     public static void destroy (Context context) {

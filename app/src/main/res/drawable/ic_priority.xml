@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Diamond -->
+    <path
+        android:fillColor="#DDE7F5"
+        android:pathData="
+            M12,2
+            L21,12
+            L12,22
+            L3,12
+            Z"/>
+
+    <!-- Inner Glow -->
+    <path
+        android:fillColor="#6638BDF8"
+        android:pathData="
+            M12,7
+            L16.5,12
+            L12,17
+            L7.5,12
+            Z"/>
+
+</vector>

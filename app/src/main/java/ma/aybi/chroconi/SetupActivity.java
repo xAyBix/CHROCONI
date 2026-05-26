@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,10 +14,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.util.prefs.Preferences;
-
 import ma.aybi.chroconi.config.PreferencesManager;
-import ma.aybi.chroconi.github.BooleanCallBack;
 import ma.aybi.chroconi.github.GithubConnection;
 import ma.aybi.chroconi.security.Encryptor;
 
@@ -37,7 +33,7 @@ public class SetupActivity extends AppCompatActivity {
         });
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
-        etToken = findViewById(R.id.etToken);
+        etToken = findViewById(R.id.etInvitedname);
         btnSetup = findViewById(R.id.btnSetup);
 
         setPasswordInputsListeners();
