@@ -5,13 +5,17 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -26,12 +30,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ma.aybi.chroconi.adapter.ConversationAdapter;
+import ma.aybi.chroconi.github.BooleanCallBack;
 import ma.aybi.chroconi.github.GithubConnection;
 import ma.aybi.chroconi.model.Conversation;
 
 public class InboxActivity extends AppCompatActivity {
     RecyclerView chatRecycler;
+    View toastLayout;
+    TextView toastText;
     LinearLayout btnNew;
+
+
+    EditText etHostname;
+    EditText etInvitedname;
 
     ConversationAdapter adapter;
     List<Conversation> conversationList;
@@ -122,10 +133,9 @@ public class InboxActivity extends AppCompatActivity {
         dialog.show();
 
         // INPUTS
-        EditText etHostname = dialog.findViewById(R.id.etHostname);
-        EditText etInvitedname = dialog.findViewById(R.id.etInvitedname);
+        etHostname = dialog.findViewById(R.id.etHostname);
+        etInvitedname = dialog.findViewById(R.id.etInvitedname);
 
-        // BUTTON
         Button btnCreate = dialog.findViewById(R.id.btnCreate);
 
         btnCreate.setOnClickListener(v -> {
@@ -133,7 +143,6 @@ public class InboxActivity extends AppCompatActivity {
             String hostname = etHostname.getText().toString().trim();
             String invitedname = etInvitedname.getText().toString().trim();
 
-            // VALIDATION
             if (hostname.isEmpty()) {
                 etHostname.setError("Please enter your github username");
                 return;
@@ -150,21 +159,73 @@ public class InboxActivity extends AppCompatActivity {
                 return;
             }
 
-            // 👉 NOW YOU HAVE THE VALUES
-            createConversation(hostname, invitedname);
+            createConversation(hostname, invitedname, success -> {
+                if (success)
+                    dialog.dismiss();
+            });
 
-            dialog.dismiss();
+
         });
     }
-    private void createConversation (String hostname, String invitedname) {
-        GithubConnection.createRepository(getApplicationContext(), hostname, invitedname, (success, repo) -> {
-            if (success) {
-                GithubConnection.setCollab(getApplicationContext(), repo, hostname, invitedname, (s, u) -> {
+    private void createConversation (String hostname, String invitedname, BooleanCallBack callBack) {
+        LayoutInflater inflater = getLayoutInflater();
 
+
+
+
+        Toast toast = new Toast(this);
+
+        GithubConnection.createRepository(getApplicationContext(), hostname, invitedname, (success, resp) -> {
+            if (success) {
+                GithubConnection.setCollab(getApplicationContext(), resp, hostname, invitedname, (s, r) -> {
+                    toastLayout = inflater.inflate(
+                            R.layout.success_toast,
+                            findViewById(android.R.id.content),
+                            false);
+                    toastText = toastLayout.findViewById(R.id.tvToastSuccess);
+
+                    toastText.setText("Repository created.");
+
+                    toast.setDuration(Toast.LENGTH_SHORT);
+                    toast.setView(toastLayout);
+                    toast.show();
+                    callBack.onResult(true);
+                    if (s) {
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                toastText.setText("Invitation sent.");
+                                toast.show();
+                            }
+                        }, 2000);
+                    }else {
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                toastLayout = inflater.inflate(
+                                        R.layout.error_toast,
+                                        findViewById(android.R.id.content),
+                                        false);
+                                toast.setView(toastLayout);
+                                toastText = toastLayout.findViewById(R.id.tvToastError);
+                                toastText.setText(r);
+                                toast.show();
+                            }
+                        }, 2000);
+
+                    }
                 });
             }else {
-                Log.d(">>FAILURE", "null");
+                etHostname.setError(resp);
+                callBack.onResult(false);
             }
         });
+
     }
 }

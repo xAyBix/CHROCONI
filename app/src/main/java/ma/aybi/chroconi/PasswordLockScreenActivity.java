@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +23,7 @@ import ma.aybi.chroconi.github.GithubConnection;
 import ma.aybi.chroconi.security.Encryptor;
 
 public class PasswordLockScreenActivity extends AppCompatActivity {
+    TextView tvInfo, tvReset;
     Button unlockButton;
     EditText passwordInput;
     @Override
@@ -35,8 +38,14 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
         });
         getWindow().setStatusBarColor(
                 android.graphics.Color.TRANSPARENT);
+        tvInfo = findViewById(R.id.tvInfo);
+        tvReset = findViewById(R.id.tvReset);
         unlockButton = findViewById(R.id.unlockButton);
         passwordInput = findViewById(R.id.passwordInput);
+
+        tvInfo.setVisibility(View.GONE);
+        tvReset.setVisibility(View.GONE);
+
         unlockButton.setOnClickListener(v -> {
             v.setActivated(false);
             String password = passwordInput.getText().toString();
@@ -50,16 +59,7 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
                 );
                 int attempts = PreferencesManager.getConnAttempts(getApplicationContext());
                 if (byteToken == null &&  attempts > 4) {
-                    PreferencesManager.destroy(getApplicationContext());
-
-                    PackageManager packageManager = getApplicationContext().getPackageManager();
-                    Intent intent = packageManager.getLaunchIntentForPackage(getApplicationContext().getPackageName());
-                    ComponentName componentName = intent.getComponent();
-                    Intent mainIntent = Intent.makeRestartActivityTask(componentName);
-
-                    mainIntent.setPackage(getApplicationContext().getPackageName());
-                    getApplicationContext().startActivity(mainIntent);
-                    System.exit(0);
+                    reset();
                 }else if (byteToken == null) {
                     passwordInput.setError("Wrong password");
                     PreferencesManager.increamentConnAttempts(getApplicationContext());
@@ -98,6 +98,8 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
                             finish();
                         }else {
                             passwordInput.setError("Unable to connect");
+                            tvInfo.setVisibility(View.VISIBLE);
+                            tvReset.setVisibility(View.VISIBLE);
                         }
                     });
                 }
@@ -109,8 +111,29 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
             v.setActivated(true);
 
         });
+
+        tvReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reset();
+            }
+        });
+
     }
     private boolean passwordCheck (String password) {
         return !(password.isEmpty());
+    }
+
+    private void reset () {
+        PreferencesManager.destroy(getApplicationContext());
+
+        PackageManager packageManager = getApplicationContext().getPackageManager();
+        Intent intent = packageManager.getLaunchIntentForPackage(getApplicationContext().getPackageName());
+        ComponentName componentName = intent.getComponent();
+        Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+
+        mainIntent.setPackage(getApplicationContext().getPackageName());
+        getApplicationContext().startActivity(mainIntent);
+        System.exit(0);
     }
 }

@@ -80,12 +80,9 @@ public class GithubConnection {
 
                 error -> {
                     if (error.networkResponse != null) {
-                        // Log the error for debugging
-                        String errorBody = new String(error.networkResponse.data);
-                        Log.e("GitHubAPI", "Error " + error.networkResponse.statusCode + ": " + errorBody);
-                        callBack.onResult(false, null);
+                        callBack.onResult(false, "Error " + error.networkResponse.statusCode + ": " + error.getMessage());
                     } else {
-                        callBack.onResult(false, null);
+                        callBack.onResult(false, "Error: Unable to create the repository");
                     }
                 }
         ) {
@@ -139,18 +136,17 @@ public class GithubConnection {
 
                 error -> {
                     if (error.networkResponse != null) {
-                        String errorBody = new String(error.networkResponse.data);
-                        Log.e("GitHubAPI", "Status: " + error.networkResponse.statusCode);
-                        Log.e("GitHubAPI", "Error: " + errorBody);
+                        String errorMsg = error.getMessage();
 
                         // Handle specific error cases
                         if (error.networkResponse.statusCode == 404) {
-                            Log.e("GitHubAPI", "User or repository not found");
+                            callBack.onResult(false, "Error 404: User or repository not found");
                         } else if (error.networkResponse.statusCode == 403) {
-                            Log.e("GitHubAPI", "Insufficient permissions or token missing 'repo' scope");
+                            callBack.onResult(false, "Error 403: Insufficient permissions or token missing 'repo' scope");
+                        } else {
+                            callBack.onResult(false, "Error: Unable to add collaborator");
                         }
                     }
-                    callBack.onResult(false, null);
                 }
         ) {
             @Override
