@@ -28,24 +28,34 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import ma.aybi.chroconi.adapter.ConversationAdapter;
+import ma.aybi.chroconi.adapter.InvitationAdapter;
 import ma.aybi.chroconi.github.BooleanCallBack;
 import ma.aybi.chroconi.github.GithubConnection;
 import ma.aybi.chroconi.model.Conversation;
+import ma.aybi.chroconi.model.Invitation;
 
 public class InboxActivity extends AppCompatActivity {
-    RecyclerView chatRecycler;
+    RecyclerView chatRecycler, invitationsRecycler;
     View toastLayout;
     TextView toastText;
     LinearLayout btnNew;
+    LinearLayout btnNotifications;
+
+    View vNotificationsDot;
+
 
 
     EditText etHostname;
     EditText etInvitedname;
 
-    ConversationAdapter adapter;
+    ConversationAdapter conversationAdapter;
+    InvitationAdapter invitationAdapter;
+
     List<Conversation> conversationList;
+    List<Invitation> invitationsList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,25 +69,25 @@ public class InboxActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(
                 android.graphics.Color.TRANSPARENT);
 
-//        GithubConnection.createRepository(getApplicationContext(), "xAyBix", "yassine-mar", (success, repo) -> {
-//            if (success) {
-//                GithubConnection.setCollab(getApplicationContext(), repo,"xAyBix", "yassine-mar", (s, u) -> {
-//
-//                });
-//            }else {
-//                Log.d(">>FAILURE", "null");
-//            }
-//        });
+        vNotificationsDot = findViewById(R.id.vNotificationsDot);
+        vNotificationsDot.setVisibility(View.INVISIBLE);
 
         chatRecycler = findViewById(R.id.chatRecycler);
-        btnNew =
-                findViewById(R.id.btnNew);
+        btnNew = findViewById(R.id.btnNew);
+        btnNotifications = findViewById(R.id.btnNotifications);
+
+        invitationsList = checkForInvitations();
+        if (!invitationsList.isEmpty())
+            vNotificationsDot.setVisibility(View.VISIBLE);
 
         btnNew.setOnClickListener(v -> {
-
             showNewChatDialog();
-
         });
+        btnNotifications.setOnClickListener(v -> {
+            showNotificationsDialog();
+        });
+
+
 
         chatRecycler.setHasFixedSize(true);
         chatRecycler.setItemAnimator(null);
@@ -103,7 +113,7 @@ public class InboxActivity extends AppCompatActivity {
                         "Wach",
                         "Yesterday"));
 
-        adapter = new ConversationAdapter(
+        conversationAdapter = new ConversationAdapter(
                 this,
                 conversationList);
 
@@ -111,8 +121,41 @@ public class InboxActivity extends AppCompatActivity {
                 new LinearLayoutManager(this));
 
 
-        chatRecycler.setAdapter(adapter);
+        chatRecycler.setAdapter(conversationAdapter);
     }
+
+    private void showNotificationsDialog() {
+        Dialog dialog = new Dialog(this);
+
+        dialog.setContentView(
+                R.layout.dialog_notifications);
+
+        dialog.getWindow().setBackgroundDrawable(
+                new ColorDrawable(Color.TRANSPARENT));
+
+        dialog.getWindow().setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        dialog.getWindow().getAttributes().windowAnimations =
+                R.style.DialogAnimation;
+
+
+        invitationsRecycler = dialog.findViewById(R.id.invitationsRecycler);
+
+        invitationsRecycler.setHasFixedSize(true);
+        invitationsRecycler.setItemAnimator(null);
+
+        invitationAdapter = new InvitationAdapter(this, invitationsList);
+        invitationsRecycler.setLayoutManager(
+                new LinearLayoutManager(this));
+        invitationsRecycler.setAdapter(invitationAdapter);
+
+        dialog.show();
+
+
+    }
+
     private void showNewChatDialog() {
 
         Dialog dialog = new Dialog(this);
@@ -227,5 +270,9 @@ public class InboxActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private List<Invitation> checkForInvitations (){
+        return GithubConnection.getCollabInvitations(getApplicationContext());
     }
 }

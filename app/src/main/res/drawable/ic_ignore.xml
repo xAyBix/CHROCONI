@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Outer Glow Circle -->
+    <path
+        android:fillColor="#22FF5C7A"
+        android:pathData="
+            M12,2
+            A10,10 0 1,1 12,22
+            A10,10 0 0,1 12,2Z"/>
+
+    <!-- X -->
+    <path
+        android:fillColor="#DDE7F5"
+        android:pathData="
+            M8.7,7.3
+            C8.3,6.9 7.7,6.9 7.3,7.3
+            C6.9,7.7 6.9,8.3 7.3,8.7
+            L10.6,12
+            L7.3,15.3
+            C6.9,15.7 6.9,16.3 7.3,16.7
+            C7.7,17.1 8.3,17.1 8.7,16.7
+            L12,13.4
+            L15.3,16.7
+            C15.7,17.1 16.3,17.1 16.7,16.7
+            C17.1,16.3 17.1,15.7 16.7,15.3
+            L13.4,12
+            L16.7,8.7
+            C17.1,8.3 17.1,7.7 16.7,7.3
+            C16.3,6.9 15.7,6.9 15.3,7.3
+            L12,10.6
+            Z"/>
+
+</vector>

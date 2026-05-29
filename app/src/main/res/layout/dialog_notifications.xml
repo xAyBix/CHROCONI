@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="18dp"
+    android:background="@drawable/bg_dialog_glass"
+    android:elevation="20dp"
+    android:orientation="vertical"
+    android:padding="26dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notifications"
+                android:textColor="@color/silver"
+                android:textSize="24sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+
+    <!-- Divider Space -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="26dp"/>
+
+    <!-- Invitations Recycler -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/invitationsRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false"/>
+
+</LinearLayout>

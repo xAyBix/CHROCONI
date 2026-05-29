@@ -3,20 +3,30 @@ package ma.aybi.chroconi.github;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import ma.aybi.chroconi.config.PreferencesManager;
+import ma.aybi.chroconi.model.Conversation;
+import ma.aybi.chroconi.model.Invitation;
 import ma.aybi.chroconi.security.Encryptor;
 import ma.aybi.chroconi.util.Constants;
 
@@ -124,13 +134,11 @@ public class GithubConnection {
                 "/collaborators/" + invitedname;
 
         JsonObjectRequest requestCollab = new JsonObjectRequest(
-                Request.Method.PUT,  // Use PUT to add/update collaborator
+                Request.Method.PUT,
                 urlCollab,
                 null,
 
                 response -> {
-                    // HTTP 201 - Invitation sent successfully
-                    // HTTP 204 - User already a collaborator
                     callBack.onResult(true, repoName);
                 },
 
@@ -138,7 +146,6 @@ public class GithubConnection {
                     if (error.networkResponse != null) {
                         String errorMsg = error.getMessage();
 
-                        // Handle specific error cases
                         if (error.networkResponse.statusCode == 404) {
                             callBack.onResult(false, "Error 404: User or repository not found");
                         } else if (error.networkResponse.statusCode == 403) {
@@ -168,6 +175,95 @@ public class GithubConnection {
     }
     public static void deleteRepository () {
 
+    }
+
+    public static List<Invitation> getCollabInvitations (Context context) {
+        List<Invitation> invitations = new ArrayList<>();
+
+        RequestQueue volleyQueue = Volley.newRequestQueue(context);
+        String token = Encryptor.byteToString(Encryptor.decrypt(PreferencesManager.getToken(context)));
+        String url = "https://api.github.com/user/repository_invitations";
+
+        String ignoredString = PreferencesManager.getIgnoredInvitations(context);
+
+        final Set<Integer> ignored = (ignoredString != null) ?
+                Arrays.stream(ignoredString.split("_"))
+                        .map(Integer::parseInt)
+                        .collect(Collectors.toSet())
+                :
+                new HashSet<>();
+
+        JsonObjectRequest requestCollab = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+
+                response -> {
+                    try {
+                        JSONArray invitationsArray = new JSONArray(response.toString());
+                        for (int i = 0 ; i < invitationsArray.length() ; i++) {
+                            JSONObject invitation = invitationsArray.getJSONObject(i);
+                            int id = invitation.getInt("id");
+                            if (ignored.stream().noneMatch(inv -> inv == id)) {
+                                JSONObject repoObj = invitation.getJSONObject("repository");
+                                String repoName = repoObj.getString("full_name").split("/")[1];
+                                if (repoName.startsWith(Constants.REPO_PREFIXES)) {
+                                    JSONObject inviterObj = invitation.getJSONObject("inviter");
+                                    String inviterLogin = inviterObj.getString("login");
+
+                                    invitations.add(new Invitation(id,inviterLogin));
+                                }
+                            }
+                        }
+                    }catch (Exception e) {
+
+                    }
+                },
+
+                error -> {
+
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                headers.put("Accept", "application/vnd.github.v3+json");
+                return headers;
+            }
+        };
+        volleyQueue.add(requestCollab);
+
+        return invitations;
+    }
+
+    public static void acceptInvitation (Context context, int id, BooleanCallBack callBack) {
+        RequestQueue volleyQueue = Volley.newRequestQueue(context);
+        String token = Encryptor.byteToString(Encryptor.decrypt(PreferencesManager.getToken(context)));
+
+        String url = "https://api.github.com/user/repository_invitations/"+id;
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.PATCH,
+                url,
+                null,
+                response -> {
+                    callBack.onResult(true);
+                },
+                error -> {
+                    callBack.onResult(false);
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                headers.put("Accept", "application/vnd.github.v3+json");
+                return headers;
+            }
+        };
+
+        volleyQueue.add(request);
     }
 
 }

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Conversation {
-    private List<Message> allMessages = new ArrayList<>();
+    private static List<Conversation> allConversations = new ArrayList<>();
+    private List<Message> messages;
 
     private String name;
     private String lastMessage;
@@ -16,8 +17,16 @@ public class Conversation {
         this.time = time;
     }
 
-    public List<Message> getAllMessages () {
-        return allMessages;
+    public static List<Conversation> getAllConversations () {
+        return allConversations;
+    }
+
+    public static void addConversation (Conversation conversation) {
+        allConversations.add(conversation);
+    }
+
+    public List<Message> getMessages () {
+        return messages;
     }
 
     public void seekMessages () {

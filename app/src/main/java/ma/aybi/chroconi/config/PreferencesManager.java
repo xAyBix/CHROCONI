@@ -13,6 +13,7 @@ public class PreferencesManager {
     private static final String SALT = "salt";
     private static final String TOKEN = "tkn";
     private static final String CONN_ATTEMPTS = "conn_attempts";
+    private static  final String IGNORED_INVITATIONS = "ignored_invitations";
 
     private static SharedPreferences getPrefs(
             Context context) {
@@ -64,6 +65,24 @@ public class PreferencesManager {
     public static int getConnAttempts(Context context) {
         return getPrefs(context).getInt(CONN_ATTEMPTS, 0);
     }
+
+    public static String getIgnoredInvitations(Context context) {
+        return getPrefs(context).getString(IGNORED_INVITATIONS, null);
+    }
+    public static void addToIgnoredInvitations(Context context, int id) {
+        String prev = getIgnoredInvitations(context);
+        if (prev == null) {
+            getPrefs(context).edit()
+                    .putString(IGNORED_INVITATIONS, String.valueOf(id))
+                    .apply();
+        }else {
+            getPrefs(context).edit()
+                    .putString(IGNORED_INVITATIONS, prev + "_" + String.valueOf(id))
+                    .apply();
+        }
+
+    }
+
     public static void increamentConnAttempts(Context context) {
         getPrefs(context).edit()
                 .putInt(CONN_ATTEMPTS, getConnAttempts(context)+1)
