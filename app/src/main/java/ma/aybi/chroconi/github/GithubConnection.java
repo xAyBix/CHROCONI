@@ -9,23 +9,18 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
-
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import ma.aybi.chroconi.config.PreferencesManager;
-import ma.aybi.chroconi.model.Conversation;
 import ma.aybi.chroconi.model.Invitation;
 import ma.aybi.chroconi.security.Encryptor;
 import ma.aybi.chroconi.util.Constants;
@@ -33,7 +28,7 @@ import ma.aybi.chroconi.util.Constants;
 public class GithubConnection {
     public static void testConnection(Context context,
                                       String token,
-                                      BooleanCallBack callback) {
+                                      BooleanStringCallBack callback) {
 
         RequestQueue volleyQueue = Volley.newRequestQueue(context);
 
@@ -46,13 +41,20 @@ public class GithubConnection {
 
                 response -> {
                     // HTTP 200
-                    callback.onResult(true);
+                    try {
+                        JSONObject json = new JSONObject(response.toString());
+                        callback.onResult(true, json.getString("login"));
+                    } catch (Exception e) {
+
+                    }
+
+
                 },
 
                 error -> {
 
                     if (error.networkResponse != null) {
-                        callback.onResult(false);
+                        callback.onResult(false, null);
                     }
                 }
 
@@ -177,8 +179,7 @@ public class GithubConnection {
 
     }
 
-    public static List<Invitation> getCollabInvitations (Context context) {
-        List<Invitation> invitations = new ArrayList<>();
+    public static void getCollabInvitations (Context context, BooleanCallBack callBack) {
 
         RequestQueue volleyQueue = Volley.newRequestQueue(context);
         String token = Encryptor.byteToString(Encryptor.decrypt(PreferencesManager.getToken(context)));
@@ -200,7 +201,18 @@ public class GithubConnection {
 
                 response -> {
                     try {
-                        JSONArray invitationsArray = new JSONArray(response.toString());
+
+                    }catch (Exception e) {
+                        Log.d(">>>EXEP INV", e.getMessage());
+                    }
+                    callBack.onResult(false);
+                },
+
+                error -> {
+                    try {
+                        JSONArray invitationsArray = new JSONArray(error.toString().replace("com.android.volley.ParseError: org.json.JSONException: Value ", ""));
+                        Invitation.invitations.clear();
+
                         for (int i = 0 ; i < invitationsArray.length() ; i++) {
                             JSONObject invitation = invitationsArray.getJSONObject(i);
                             int id = invitation.getInt("id");
@@ -211,17 +223,15 @@ public class GithubConnection {
                                     JSONObject inviterObj = invitation.getJSONObject("inviter");
                                     String inviterLogin = inviterObj.getString("login");
 
-                                    invitations.add(new Invitation(id,inviterLogin));
+                                    new Invitation(id,inviterLogin);
                                 }
                             }
                         }
+
                     }catch (Exception e) {
-
+                        Log.d(">>>EXEP INV", error.toString());
                     }
-                },
-
-                error -> {
-
+                    callBack.onResult(true);
                 }
         ) {
             @Override
@@ -234,14 +244,13 @@ public class GithubConnection {
         };
         volleyQueue.add(requestCollab);
 
-        return invitations;
     }
 
     public static void acceptInvitation (Context context, int id, BooleanCallBack callBack) {
         RequestQueue volleyQueue = Volley.newRequestQueue(context);
         String token = Encryptor.byteToString(Encryptor.decrypt(PreferencesManager.getToken(context)));
 
-        String url = "https://api.github.com/user/repository_invitations/"+id;
+        String url = "https://api.github.com/user/repository_invitations/"+String.valueOf(id);
 
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.PATCH,
@@ -252,6 +261,7 @@ public class GithubConnection {
                 },
                 error -> {
                     callBack.onResult(false);
+                    Log.d(">>>ERRRR", error.toString());
                 }
         ) {
             @Override
@@ -264,6 +274,7 @@ public class GithubConnection {
         };
 
         volleyQueue.add(request);
+
     }
 
 }

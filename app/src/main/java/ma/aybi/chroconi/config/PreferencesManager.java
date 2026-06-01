@@ -13,7 +13,8 @@ public class PreferencesManager {
     private static final String SALT = "salt";
     private static final String TOKEN = "tkn";
     private static final String CONN_ATTEMPTS = "conn_attempts";
-    private static  final String IGNORED_INVITATIONS = "ignored_invitations";
+    private static final String IGNORED_INVITATIONS = "ignored_invitations";
+    private static final String LOGIN = "login";
 
     private static SharedPreferences getPrefs(
             Context context) {
@@ -98,5 +99,14 @@ public class PreferencesManager {
                 .clear()
                 .commit();
 
+    }
+    public static String getLogin (Context context) {
+        return getPrefs(context)
+                .getString(LOGIN, null);
+    }
+    public static void setLogin (Context context, String login) {
+        getPrefs(context).edit()
+                .putString(LOGIN, login)
+                .commit();
     }
 }

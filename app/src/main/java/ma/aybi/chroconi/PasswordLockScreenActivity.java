@@ -66,7 +66,7 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
                     unlockButton.setText("UNLOCK (" + (5-PreferencesManager.getConnAttempts(getApplicationContext())) + ")" );
                 }else{
                     String textToken = Encryptor.byteToString(byteToken);
-                    GithubConnection.testConnection(getApplicationContext(), textToken, success -> {
+                    GithubConnection.testConnection(getApplicationContext(), textToken, (success, text) -> {
                         if (success) {
                             Intent intent =
                                     new Intent(

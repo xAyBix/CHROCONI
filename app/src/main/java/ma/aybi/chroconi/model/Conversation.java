@@ -4,25 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Conversation {
-    private static List<Conversation> allConversations = new ArrayList<>();
+    public static List<Conversation> allConversations = new ArrayList<>();
     private List<Message> messages;
 
+    private String gitURI;
     private String name;
     private String lastMessage;
     private String time;
 
-    public Conversation(String name, String lastMessage, String time) {
+    public Conversation(String gitURI, String name, String lastMessage, String time) {
+        this.gitURI = gitURI;
         this.name = name;
         this.lastMessage = lastMessage;
         this.time = time;
-    }
-
-    public static List<Conversation> getAllConversations () {
-        return allConversations;
-    }
-
-    public static void addConversation (Conversation conversation) {
-        allConversations.add(conversation);
+        allConversations.add(this);
     }
 
     public List<Message> getMessages () {
@@ -43,5 +38,13 @@ public class Conversation {
 
     public String getTime() {
         return time;
+    }
+
+    public String getGitURI() {
+        return gitURI;
+    }
+
+    public void setGitURI(String gitURI) {
+        this.gitURI = gitURI;
     }
 }

@@ -20,13 +20,9 @@ public class ConversationAdapter
         extends RecyclerView.Adapter<ConversationAdapter.ViewHolder> {
 
     Context context;
-    List<Conversation> conversationList;
 
-    public ConversationAdapter(Context context,
-                               List<Conversation> conversationList) {
-
+    public ConversationAdapter(Context context) {
         this.context = context;
-        this.conversationList = conversationList;
     }
 
     @NonNull
@@ -49,11 +45,15 @@ public class ConversationAdapter
             int position) {
 
         Conversation conversation =
-                conversationList.get(position);
+                Conversation.allConversations.get(position);
 
         holder.name.setText(conversation.getName());
-        holder.message.setText(conversation.getLastMessage());
-        holder.time.setText(conversation.getTime());
+        holder.message.setText((conversation.getLastMessage() != null) ?
+                conversation.getLastMessage() :
+                "Say hi to "+conversation.getName()+"!");
+        holder.time.setText((conversation.getTime() != null) ?
+                conversation.getTime() :
+                "");
 
         holder.itemView.setOnClickListener(v -> {
 
@@ -75,7 +75,7 @@ public class ConversationAdapter
 
     @Override
     public int getItemCount() {
-        return conversationList.size();
+        return Conversation.allConversations.size();
     }
 
     public static class ViewHolder

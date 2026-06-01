@@ -1,14 +1,11 @@
 package ma.aybi.chroconi;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -26,9 +22,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import ma.aybi.chroconi.adapter.ConversationAdapter;
 import ma.aybi.chroconi.adapter.InvitationAdapter;
@@ -54,8 +48,7 @@ public class InboxActivity extends AppCompatActivity {
     ConversationAdapter conversationAdapter;
     InvitationAdapter invitationAdapter;
 
-    List<Conversation> conversationList;
-    List<Invitation> invitationsList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,14 +64,22 @@ public class InboxActivity extends AppCompatActivity {
 
         vNotificationsDot = findViewById(R.id.vNotificationsDot);
         vNotificationsDot.setVisibility(View.INVISIBLE);
+        InvitationAdapter.vNotificationsDot = vNotificationsDot;
 
         chatRecycler = findViewById(R.id.chatRecycler);
         btnNew = findViewById(R.id.btnNew);
         btnNotifications = findViewById(R.id.btnNotifications);
+        runOnUiThread(()->{
+            GithubConnection.getCollabInvitations(this, success -> {
+                        if (!Invitation.invitations.isEmpty()) {
+                            vNotificationsDot.invalidate();
+                            vNotificationsDot.setVisibility(View.VISIBLE);
+                        }
+            });
+        });
 
-        invitationsList = checkForInvitations();
-        if (!invitationsList.isEmpty())
-            vNotificationsDot.setVisibility(View.VISIBLE);
+
+
 
         btnNew.setOnClickListener(v -> {
             showNewChatDialog();
@@ -92,30 +93,11 @@ public class InboxActivity extends AppCompatActivity {
         chatRecycler.setHasFixedSize(true);
         chatRecycler.setItemAnimator(null);
 
-        conversationList = new ArrayList<>();
 
         // Dummy Premium Data
-        conversationList.add(
-                new Conversation(
-                        "Fatima Zahrae",
-                        "See you tonight ✨",
-                        "11:42"));
 
-        conversationList.add(
-                new Conversation(
-                        "Hamza",
-                        "Hhhh",
-                        "09:21"));
 
-        conversationList.add(
-                new Conversation(
-                        "Mohammed Amine",
-                        "Wach",
-                        "Yesterday"));
-
-        conversationAdapter = new ConversationAdapter(
-                this,
-                conversationList);
+        conversationAdapter = new ConversationAdapter(this);
 
         chatRecycler.setLayoutManager(
                 new LinearLayoutManager(this));
@@ -125,6 +107,7 @@ public class InboxActivity extends AppCompatActivity {
     }
 
     private void showNotificationsDialog() {
+
         Dialog dialog = new Dialog(this);
 
         dialog.setContentView(
@@ -145,14 +128,13 @@ public class InboxActivity extends AppCompatActivity {
 
         invitationsRecycler.setHasFixedSize(true);
         invitationsRecycler.setItemAnimator(null);
+        invitationAdapter = new InvitationAdapter(this);
 
-        invitationAdapter = new InvitationAdapter(this, invitationsList);
         invitationsRecycler.setLayoutManager(
                 new LinearLayoutManager(this));
         invitationsRecycler.setAdapter(invitationAdapter);
 
         dialog.show();
-
 
     }
 
@@ -203,18 +185,15 @@ public class InboxActivity extends AppCompatActivity {
             }
 
             createConversation(hostname, invitedname, success -> {
-                if (success)
+                if (success) {
                     dialog.dismiss();
+                }
             });
-
 
         });
     }
     private void createConversation (String hostname, String invitedname, BooleanCallBack callBack) {
         LayoutInflater inflater = getLayoutInflater();
-
-
-
 
         Toast toast = new Toast(this);
 
@@ -242,6 +221,8 @@ public class InboxActivity extends AppCompatActivity {
                             {
                                 toastText.setText("Invitation sent.");
                                 toast.show();
+                                new Conversation(hostname + "/" + r + ".git", invitedname, null, null);
+                                conversationAdapter.notifyDataSetChanged();
                             }
                         }, 2000);
                     }else {
@@ -272,7 +253,5 @@ public class InboxActivity extends AppCompatActivity {
 
     }
 
-    private List<Invitation> checkForInvitations (){
-        return GithubConnection.getCollabInvitations(getApplicationContext());
-    }
+
 }

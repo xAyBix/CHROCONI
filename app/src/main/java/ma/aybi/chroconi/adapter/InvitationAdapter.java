@@ -12,21 +12,19 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
-
 import ma.aybi.chroconi.R;
 import ma.aybi.chroconi.model.Invitation;
 
+
 public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.ViewHolder> {
     Context context;
-    List<Invitation> invitationList;
-    View toastLayout;
+    public static View vNotificationsDot;
     TextView toastText;
     LayoutInflater inflater;
 
-    public InvitationAdapter(Context context, List<Invitation> invitationList) {
+
+    public InvitationAdapter(Context context) {
         this.context = context;
-        this.invitationList = invitationList;
     }
 
     @NonNull
@@ -45,13 +43,13 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
     public void onBindViewHolder(@NonNull InvitationAdapter.ViewHolder holder, int position) {
         int pos = holder.getAdapterPosition();
         if (pos == RecyclerView.NO_POSITION) return;
-        Invitation invitation = invitationList.get(pos);
+        Invitation invitation = Invitation.invitations.get(pos);
         Toast toast = new Toast(context);
 
 
 
         holder.tvUsername.setText(invitation.getInviter());
-        holder.tvId.setText(invitation.getId());
+        holder.tvId.setText(String.valueOf(invitation.getId()));
 
         holder.btnAccept.setOnClickListener(v -> {
             Invitation.applyToInvitationById(context, invitation.getId(), Invitation.ACCEPT, (res, text) ->{
@@ -61,6 +59,10 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
                 }else {
                     showToast(false, text, holder);
                 }
+                if (Invitation.invitations.isEmpty()) {
+                    vNotificationsDot.invalidate();
+                    vNotificationsDot.setVisibility(View.INVISIBLE);
+                }
             });
         });
 
@@ -69,13 +71,17 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
                     showToast(true, "Invitation ignored", holder);
                     removeItem(pos);
             });
+            if (Invitation.invitations.isEmpty()) {
+                vNotificationsDot.invalidate();
+                vNotificationsDot.setVisibility(View.INVISIBLE);
+            }
         });
 
     }
 
     @Override
     public int getItemCount() {
-        return invitationList.size();
+        return Invitation.invitations.size();
     }
 
     public static class ViewHolder
@@ -95,9 +101,8 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
         }
     }
     private void removeItem(int position) {
-        invitationList.remove(position);
         notifyItemRemoved(position);
-        notifyItemRangeChanged(position, invitationList.size());
+        notifyItemRangeChanged(position, Invitation.invitations.size());
     }
     private void showToast(boolean success, String text, ViewHolder holder) {
 
@@ -109,7 +114,7 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
 
         View view = inflater.inflate(
                 layoutId,
-                holder.itemView.getRootView().findViewById(android.R.id.content),
+                null,
                 false
         );
 

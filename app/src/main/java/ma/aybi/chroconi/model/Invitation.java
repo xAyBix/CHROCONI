@@ -2,11 +2,15 @@ package ma.aybi.chroconi.model;
 
 import android.content.Context;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ma.aybi.chroconi.config.PreferencesManager;
 import ma.aybi.chroconi.github.BooleanStringCallBack;
 import ma.aybi.chroconi.github.GithubConnection;
 
 public class Invitation {
+    public static final List<Invitation> invitations= new ArrayList<>();
     public static final int IGNORE = 0;
     public static final int ACCEPT = 1;
 
@@ -18,6 +22,7 @@ public class Invitation {
     public Invitation(int id, String inviter) {
         this.id = id;
         this.inviter = inviter;
+        invitations.add(this);
     }
 
     public int getId() {
@@ -47,6 +52,13 @@ public class Invitation {
             });
         }else {
             PreferencesManager.addToIgnoredInvitations(context, id);
+            for (Invitation i : invitations) {
+                if (i.id == id) {
+                    invitations.remove(i);
+                    callBack.onResult(true, "Invitation ignored");
+                    break;
+                }
+            }
         }
     }
 

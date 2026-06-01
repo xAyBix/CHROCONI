@@ -128,7 +128,7 @@ public class SetupActivity extends AppCompatActivity {
         });
     }
     private void tryToConnect (String token) {
-        GithubConnection.testConnection(getApplicationContext(), token, success -> {
+        GithubConnection.testConnection(getApplicationContext(), token, (success, text) -> {
            if (success) {
                // Generating salt
                Encryptor.setSalt(
@@ -146,6 +146,8 @@ public class SetupActivity extends AppCompatActivity {
                PreferencesManager.setToken(getApplicationContext(), encryptedToken);
 
                PreferencesManager.setFirstTime(getApplicationContext(), false);
+
+               PreferencesManager.setLogin(getApplicationContext(), text);
 
 
                Intent intent = new Intent(getApplicationContext(), InboxActivity.class);
