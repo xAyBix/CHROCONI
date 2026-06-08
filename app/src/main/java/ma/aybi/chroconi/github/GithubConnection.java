@@ -1,12 +1,15 @@
 package ma.aybi.chroconi.github;
 
 import android.content.Context;
+import android.util.Base64;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -194,27 +197,17 @@ public class GithubConnection {
                 :
                 new HashSet<>();
 
-        JsonObjectRequest requestCollab = new JsonObjectRequest(
+        JsonArrayRequest request = new JsonArrayRequest(
                 Request.Method.GET,
                 url,
                 null,
 
                 response -> {
                     try {
-
-                    }catch (Exception e) {
-                        Log.d(">>>EXEP INV", e.getMessage());
-                    }
-                    callBack.onResult(false);
-                },
-
-                error -> {
-                    try {
-                        JSONArray invitationsArray = new JSONArray(error.toString().replace("com.android.volley.ParseError: org.json.JSONException: Value ", ""));
                         Invitation.invitations.clear();
 
-                        for (int i = 0 ; i < invitationsArray.length() ; i++) {
-                            JSONObject invitation = invitationsArray.getJSONObject(i);
+                        for (int i = 0 ; i < response.length() ; i++) {
+                            JSONObject invitation = response.getJSONObject(i);
                             int id = invitation.getInt("id");
                             if (ignored.stream().noneMatch(inv -> inv == id)) {
                                 JSONObject repoObj = invitation.getJSONObject("repository");
@@ -223,15 +216,19 @@ public class GithubConnection {
                                     JSONObject inviterObj = invitation.getJSONObject("inviter");
                                     String inviterLogin = inviterObj.getString("login");
 
-                                    new Invitation(id,inviterLogin);
+                                    new Invitation(id, inviterLogin, inviterLogin + "/" + repoName);
                                 }
                             }
                         }
 
-                    }catch (Exception e) {
-                        Log.d(">>>EXEP INV", error.toString());
+                    } catch (Exception e) {
+                        Log.d(">>>EXEP INV", e.getMessage());
                     }
                     callBack.onResult(true);
+                },
+
+                error -> {
+                    callBack.onResult(false);
                 }
         ) {
             @Override
@@ -242,7 +239,7 @@ public class GithubConnection {
                 return headers;
             }
         };
-        volleyQueue.add(requestCollab);
+        volleyQueue.add(request);
 
     }
 
@@ -252,10 +249,9 @@ public class GithubConnection {
 
         String url = "https://api.github.com/user/repository_invitations/"+String.valueOf(id);
 
-        JsonObjectRequest request = new JsonObjectRequest(
+        StringRequest request = new StringRequest(
                 Request.Method.PATCH,
                 url,
-                null,
                 response -> {
                     callBack.onResult(true);
                 },
@@ -275,6 +271,92 @@ public class GithubConnection {
 
         volleyQueue.add(request);
 
+    }
+
+    public static void getRepoContents(Context context, String owner, String repo, ContentCallBack callBack) {
+        RequestQueue volleyQueue = Volley.newRequestQueue(context);
+        String token = Encryptor.byteToString(Encryptor.decrypt(PreferencesManager.getToken(context)));
+        String url = "https://api.github.com/repos/" + owner + "/" + repo + "/contents";
+
+        StringRequest request = new StringRequest(
+                Request.Method.GET,
+                url,
+                response -> callBack.onResult(true, response),
+                error -> callBack.onResult(false, null)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                headers.put("Accept", "application/vnd.github.v3+json");
+                return headers;
+            }
+        };
+        volleyQueue.add(request);
+    }
+
+    public static void getFileContent(Context context, String owner, String repo, String filePath, ContentCallBack callBack) {
+        RequestQueue volleyQueue = Volley.newRequestQueue(context);
+        String token = Encryptor.byteToString(Encryptor.decrypt(PreferencesManager.getToken(context)));
+        String url = "https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + filePath;
+
+        StringRequest request = new StringRequest(
+                Request.Method.GET,
+                url,
+                response -> callBack.onResult(true, response),
+                error -> callBack.onResult(false, null)
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                headers.put("Accept", "application/vnd.github.v3+json");
+                return headers;
+            }
+        };
+        volleyQueue.add(request);
+    }
+
+    public static void pushFileToRepo (Context context, String owner, String repo, String filePath, String content, BooleanCallBack callBack) {
+        RequestQueue volleyQueue = Volley.newRequestQueue(context);
+        String token = Encryptor.byteToString(Encryptor.decrypt(PreferencesManager.getToken(context)));
+
+        String url = "https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + filePath;
+
+        String encodedContent = Base64.encodeToString(content.getBytes(), Base64.NO_WRAP);
+
+        StringRequest request = new StringRequest(
+                Request.Method.PUT,
+                url,
+                response -> {
+                    callBack.onResult(true);
+                },
+                error -> {
+                    Log.d(">>>PUSH_ERR", error.toString());
+                    callBack.onResult(false);
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + token);
+                headers.put("Accept", "application/vnd.github.v3+json");
+                return headers;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=" + getParamsEncoding();
+            }
+
+            @Override
+            public byte[] getBody() {
+                String jsonBody = "{\"message\":\"Add file\",\"content\":\"" + encodedContent + "\"}";
+                return jsonBody.getBytes();
+            }
+        };
+
+        volleyQueue.add(request);
     }
 
 }

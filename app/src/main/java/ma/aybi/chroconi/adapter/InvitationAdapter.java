@@ -22,6 +22,16 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
     TextView toastText;
     LayoutInflater inflater;
 
+    private OnInvitationAcceptedListener onAcceptedListener;
+
+    public interface OnInvitationAcceptedListener {
+        void onAccepted(String repoFullName, String inviter);
+    }
+
+    public void setOnInvitationAcceptedListener(OnInvitationAcceptedListener listener) {
+        this.onAcceptedListener = listener;
+    }
+
 
     public InvitationAdapter(Context context) {
         this.context = context;
@@ -41,40 +51,36 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull InvitationAdapter.ViewHolder holder, int position) {
-        int pos = holder.getAdapterPosition();
-        if (pos == RecyclerView.NO_POSITION) return;
-        Invitation invitation = Invitation.invitations.get(pos);
-        Toast toast = new Toast(context);
-
-
+        Invitation invitation = Invitation.invitations.get(position);
 
         holder.tvUsername.setText(invitation.getInviter());
         holder.tvId.setText(String.valueOf(invitation.getId()));
 
         holder.btnAccept.setOnClickListener(v -> {
-            Invitation.applyToInvitationById(context, invitation.getId(), Invitation.ACCEPT, (res, text) ->{
+            int pos = holder.getAdapterPosition();
+            if (pos == RecyclerView.NO_POSITION) return;
+            Invitation invitationAtPos = Invitation.invitations.get(pos);
+            Invitation.applyToInvitationById(context, invitationAtPos.getId(), Invitation.ACCEPT, (res, repoFullName) ->{
                 if (res) {
-                    showToast(true, text, holder);
+                    showToast(true, "Invitation accepted", holder);
+                    if (repoFullName != null && onAcceptedListener != null) {
+                        onAcceptedListener.onAccepted(repoFullName, invitationAtPos.getInviter());
+                    }
                     removeItem(pos);
                 }else {
-                    showToast(false, text, holder);
-                }
-                if (Invitation.invitations.isEmpty()) {
-                    vNotificationsDot.invalidate();
-                    vNotificationsDot.setVisibility(View.INVISIBLE);
+                    showToast(false, "Something went wrong", holder);
                 }
             });
         });
 
         holder.btnIgnore.setOnClickListener(v -> {
-            Invitation.applyToInvitationById(context, invitation.getId(), Invitation.IGNORE, (res, text) ->{
-                    showToast(true, "Invitation ignored", holder);
-                    removeItem(pos);
+            int pos = holder.getAdapterPosition();
+            if (pos == RecyclerView.NO_POSITION) return;
+            Invitation invitationAtPos = Invitation.invitations.get(pos);
+            Invitation.applyToInvitationById(context, invitationAtPos.getId(), Invitation.IGNORE, (res, text) ->{
+                showToast(true, text, holder);
+                removeItem(pos);
             });
-            if (Invitation.invitations.isEmpty()) {
-                vNotificationsDot.invalidate();
-                vNotificationsDot.setVisibility(View.INVISIBLE);
-            }
         });
 
     }
@@ -101,8 +107,17 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
         }
     }
     private void removeItem(int position) {
+        if (position < 0 || position >= Invitation.invitations.size()) return;
+        int id = Invitation.invitations.get(position).getId();
         notifyItemRemoved(position);
-        notifyItemRangeChanged(position, Invitation.invitations.size());
+        Invitation.removeById(id);
+        int newSize = Invitation.invitations.size();
+        if (position < newSize) {
+            notifyItemRangeChanged(position, newSize - position);
+        }
+        if (Invitation.invitations.isEmpty()) {
+            vNotificationsDot.setVisibility(View.INVISIBLE);
+        }
     }
     private void showToast(boolean success, String text, ViewHolder holder) {
 

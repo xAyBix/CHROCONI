@@ -4,11 +4,9 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="8dp"
-    android:background="@drawable/bg_glass_card"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackgroundBorderless"
+    android:layout_marginBottom="18dp"
+    android:background="@drawable/bg_invitation_glass"
+    android:elevation="6dp"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:padding="16dp">
@@ -16,17 +14,19 @@
     <!-- Avatar -->
     <FrameLayout
         android:layout_width="58dp"
-        android:layout_height="58dp">
+        android:layout_height="58dp"
+        android:background="@drawable/bg_story_ring"
+        android:padding="2dp">
 
         <ImageView
-            android:layout_width="58dp"
-            android:layout_height="58dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/avatar_placeholder" />
 
     </FrameLayout>
 
-    <!-- Texts -->
+    <!-- Conversation name -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -40,36 +40,35 @@
             android:layout_height="wrap_content"
             android:text="Alexander"
             android:textColor="@color/silver"
-            android:textSize="18sp"
+            android:textSize="17sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvMessage"
+            android:id="@+id/tvPriorityStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="See you tonight ✨"
+            android:layout_marginTop="3dp"
+            android:text=""
             android:textColor="@color/silver_soft"
-            android:textSize="14sp" />
+            android:textSize="12sp" />
 
     </LinearLayout>
 
-    <!-- Priority icon -->
-    <ImageView
-        android:id="@+id/ivPriority"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_priority"
-        android:visibility="gone" />
+    <!-- Set/Clear button -->
+    <FrameLayout
+        android:id="@+id/btnPriorityAction"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:background="@drawable/bg_accept_glow">
 
-    <!-- Time -->
-    <TextView
-        android:id="@+id/tvTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="11:42"
-        android:textColor="@color/silver_soft"
-        android:textSize="12sp" />
+        <ImageButton
+            android:id="@+id/ivPriorityAction"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_accept_inner"
+            android:src="@drawable/ic_priority" />
+
+    </FrameLayout>
 
 </LinearLayout>

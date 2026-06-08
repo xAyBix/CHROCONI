@@ -15,6 +15,7 @@ public class PreferencesManager {
     private static final String CONN_ATTEMPTS = "conn_attempts";
     private static final String IGNORED_INVITATIONS = "ignored_invitations";
     private static final String LOGIN = "login";
+    private static final String PRIORITY_CONVERSATION = "priority_conversation";
 
     private static SharedPreferences getPrefs(
             Context context) {
@@ -108,5 +109,15 @@ public class PreferencesManager {
         getPrefs(context).edit()
                 .putString(LOGIN, login)
                 .commit();
+    }
+
+    public static String getPriorityConversation(Context context) {
+        return getPrefs(context).getString(PRIORITY_CONVERSATION, null);
+    }
+
+    public static void setPriorityConversation(Context context, String name) {
+        getPrefs(context).edit()
+                .putString(PRIORITY_CONVERSATION, name)
+                .apply();
     }
 }

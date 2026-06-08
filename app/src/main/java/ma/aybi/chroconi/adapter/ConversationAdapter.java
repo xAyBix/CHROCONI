@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import ma.aybi.chroconi.ChatActivity;
 import ma.aybi.chroconi.R;
+import ma.aybi.chroconi.config.PreferencesManager;
 import ma.aybi.chroconi.model.Conversation;
 
 public class ConversationAdapter
@@ -55,6 +57,13 @@ public class ConversationAdapter
                 conversation.getTime() :
                 "");
 
+        String priorityName = PreferencesManager.getPriorityConversation(context);
+        if (priorityName != null && priorityName.equals(conversation.getName())) {
+            holder.ivPriority.setVisibility(View.VISIBLE);
+        } else {
+            holder.ivPriority.setVisibility(View.GONE);
+        }
+
         holder.itemView.setOnClickListener(v -> {
 
             Intent intent =
@@ -82,6 +91,7 @@ public class ConversationAdapter
             extends RecyclerView.ViewHolder {
 
         TextView name, message, time;
+        ImageView ivPriority;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -89,6 +99,7 @@ public class ConversationAdapter
             name = itemView.findViewById(R.id.tvName);
             message = itemView.findViewById(R.id.tvMessage);
             time = itemView.findViewById(R.id.tvTime);
+            ivPriority = itemView.findViewById(R.id.ivPriority);
         }
     }
 }
