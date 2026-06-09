@@ -75,6 +75,10 @@ public class Conversation {
         return privateKeyEncrypted;
     }
 
+    public void setPrivateKeyEncrypted(String value) {
+        this.privateKeyEncrypted = value;
+    }
+
     public void setLastMessage(String lastMessage) {
         this.lastMessage = lastMessage;
     }
@@ -91,7 +95,8 @@ public class Conversation {
             json.put("lastMessage", lastMessage != null ? lastMessage : "");
             json.put("time", time != null ? time : "");
             json.put("publicKey", publicKey != null ? publicKey : "");
-            json.put("privateKeyEncrypted", privateKeyEncrypted != null ? privateKeyEncrypted : "");
+            json.put("privateKeyEncrypted", privateKeyEncrypted != null
+                    ? Base64.encodeToString(privateKeyEncrypted.getBytes(Charsets.ISO_8859_1), Base64.NO_WRAP) : "");
             if (messages != null && !messages.isEmpty()) {
                 JSONArray msgArray = new JSONArray();
                 for (Message msg : messages) {
@@ -115,11 +120,18 @@ public class Conversation {
             String lastMessage = json.optString("lastMessage", null);
             String time = json.optString("time", null);
             String publicKey = json.optString("publicKey", null);
-            String privateKeyEncrypted = json.optString("privateKeyEncrypted", null);
+            String privateKeyEncryptedRaw = json.optString("privateKeyEncrypted", null);
+            String privateKeyEncrypted = null;
+            if (privateKeyEncryptedRaw != null && !privateKeyEncryptedRaw.isEmpty()) {
+                try {
+                    privateKeyEncrypted = new String(Base64.decode(privateKeyEncryptedRaw, Base64.NO_WRAP), Charsets.ISO_8859_1);
+                } catch (Exception e) {
+                    privateKeyEncrypted = privateKeyEncryptedRaw;
+                }
+            }
             if (lastMessage != null && lastMessage.isEmpty()) lastMessage = null;
             if (time != null && time.isEmpty()) time = null;
             if (publicKey != null && publicKey.isEmpty()) publicKey = null;
-            if (privateKeyEncrypted != null && privateKeyEncrypted.isEmpty()) privateKeyEncrypted = null;
             Conversation c = new Conversation(gitURI, name, lastMessage, time, publicKey, privateKeyEncrypted);
             JSONArray msgArray = json.optJSONArray("messages");
             if (msgArray != null) {

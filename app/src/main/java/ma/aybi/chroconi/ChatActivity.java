@@ -156,6 +156,20 @@ public class ChatActivity extends AppCompatActivity {
         if (encPriv != null) {
             myPrivateKey = KeyUtils.decryptStoredPrivateKey(encPriv);
         }
+        if (myPrivateKey == null) {
+            java.security.KeyPair keys = KeyUtils.generateKeyPair();
+            if (keys != null) {
+                myPrivateKey = keys.getPrivate();
+                String publicKeyStr = KeyUtils.publicKeyToString(keys.getPublic());
+                byte[] encryptedPriv = Encryptor.encrypt(keys.getPrivate().getEncoded());
+                String privateKeyEncStr = encryptedPriv != null ? Encryptor.byteToString(encryptedPriv) : null;
+                conversation.setPrivateKeyEncrypted(privateKeyEncStr);
+                if (publicKeyStr != null) {
+                    GithubConnection.pushFileToRepo(this, repoOwner, repoName,
+                            currentUser + "_public", publicKeyStr, pushed -> {});
+                }
+            }
+        }
     }
 
     private void fetchOtherPublicKey() {
@@ -220,6 +234,7 @@ public class ChatActivity extends AppCompatActivity {
                         final String fileName = files.getJSONObject(i).getString("name");
                         if (!fileName.contains("_TEXTUAL_")) continue;
                         if (downloadedFiles.contains(fileName)) continue;
+                        if (currentUser != null && fileName.startsWith(currentUser + "_TEXTUAL_")) continue;
                         downloadedFiles.add(fileName);
 
                         GithubConnection.getFileContent(ChatActivity.this, repoOwner, repoName,
